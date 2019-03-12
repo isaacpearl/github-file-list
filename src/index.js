@@ -2,22 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types'
-//import moment from 'moment';
+import moment from 'moment';
+import Time from './Time/time.js';
 
 const FileList = ( { files }) => (
 	<table className="file-list">
 		<tbody>
-			{	/*
-				mapping over an array is how you render 
-				lists of things in react (unique keys are needed 
-				for an array of elements)
-				*/
-				files.map(file => 
-					(<tr className="file-list-item" key={file.id}>
-						<td className="file-name">{file.name}</td>
-					</tr>)
-				)
-			}
+			{/*
+			mapping over an array is how you render 
+			lists of things in react (unique keys are needed 
+			for an array of elements)
+			*/
+			files.map(file => 
+				<FileListItem key={file.id} file={file}/>
+			)}
 		</tbody>
 	</table>
 );
@@ -25,48 +23,55 @@ FileList.propTypes = {
 	files: PropTypes.array
 };
 
-function FileListItem({ file }) {
-	return(<div>file list item</div>);
-}
+
+const FileListItem = ({ file }) => (
+	<tr className="file-list-item">
+		{getFileName(file)}
+		<CommitMessage commit={file.latestCommit}/>
+		<td className="age">
+			<Time time={file.updated_at}/>
+		</td>
+	</tr>
+);
 FileListItem.propTypes = {
-	file: PropTypes.shape({
-		name: PropTypes.string,
-		type: PropTypes.string,
-		commit: PropTypes.string,
-		time: PropTypes.string
-	})
+	file: PropTypes.object.isRequired
+};
+
+
+function getFileName(file) {
+	return [
+		<FileIcon file={file} key={0}/>,
+		<td className="file-name" key={1}>{file.name}</td>
+	];
 }
 
-function FileName({ file }) {
-	return(<span>file name</span>);
-}
-FileName.propTypes = {
-	file: PropTypes.shape({
-		name: PropTypes.string
-	})
-}
 
 function FileIcon({ file }) {
-	return(<span>file icon</span>);
+	let icon = 'fa-file-text-o'
+	
+	if (file.type === 'folder') {
+		icon = 'fa-folder';
+	}
+
+	return (
+		<td className="file-icon">
+			<i className={`fa ${icon}`}/>
+		</td>
+	);
 }
 FileIcon.propTypes = {
-	file: PropTypes.shape({
-		type: PropTypes.string
-	})
+	file: PropTypes.object.isRequired
 }
 
-function CommitMessage({ commit }) {
-	return(<span>commit message</span>);
-}
+
+const CommitMessage = ({ commit }) => (
+	<td className="commit-message">
+		{commit.message}
+	</td>
+);
 CommitMessage.propTypes = {
-	commit: PropTypes.shape({
-		message: PropTypes.string
-	})
-}
-
-function Time ({ time }) {
-	
-}
+	commit: PropTypes.object.isRequired
+};
 
 const testFiles = [ 
 	{
